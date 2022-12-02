@@ -1,32 +1,49 @@
 const { productSer } = require("../service/main.service");
-
+const {
+  addNewProductService,
+  deleteProductService,
+  getProductListService,
+  getProductDetailService,
+  updateProductService,
+} = productSer;
 class ProductController {
-  getProductListController(req, res) {
-    res.send("Lấy danh sách sản phẩm");
+  async getProductListController(req, res) {
+    let productList = await getProductListService() ; 
+    console.log('productList' , productList.length) ; 
+    if(productList.length === 0) res.status(404).send('No Data') ; 
+    else if(productList) res.status(200).send(productList) ;
+    else res.status(404).send("Data not found !") ; 
   }
 
-  getProductDetailController(req, res) {
+  async getProductDetailController(req, res) {
     let { id } = req.params;
-    res.send(`Lấy sản phẩm chi tiết với id :${id} `);
+    let productDetail = await getProductDetailService(id) ; 
+    if(productDetail) res.status(200).send(productDetail) ; 
+    else res.status(404).send("Product not found !") ; 
   }
 
-  addNewProductController(req, res) {
+  async addNewProductController(req, res) {
     let newProduct = req.body;
-    console.log("newProduct", newProduct);
-    res.send(`Thêm sản phẩm`);
+    let newProductAdded = await addNewProductService(newProduct) ; 
+    console.log('newProductAdded',newProductAdded) ; 
+    if(newProductAdded) res.status(201).send(newProductAdded) ; 
+    else res.status(400).send(newProductAdded) ; 
   }
 
-  updateProductController(req, res) {
+  updateProductController = async (req, res) => {
     let { id } = req.params;
     let newProduct = req.body;
-    console.log("newProduct", newProduct);
-    console.log("id", id);
-    res.send(`Cập nhật sản phẩm`);
+    let productDidUpdate = await updateProductService(id,newProduct) ; 
+    if(productDidUpdate) res.status(200).send(productDidUpdate) ; 
+    else res.status(404).send("Product not found to update !") ; 
   }
 
-  deleteProductController(req, res) {
-    let {id} = req.params ; 
-    res.send(`Xóa sản phẩm có id : ${id}`) ;
+  async deleteProductController(req, res) {
+    let { id } = req.params;
+    console.log('id' , id)  ;
+    let productDidDelete = await deleteProductService(id) ; 
+    if(productDidDelete) res.status(200).send(productDidDelete) ; 
+    else res.status(404).send("Product not found to delete !") ; 
   }
 }
 
